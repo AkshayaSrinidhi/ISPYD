@@ -9,14 +9,13 @@ var passport         = require('passport');
 var LocalStrategy    = require('passport-local').Strategy;
 var cookieParser     = require('cookie-parser');
 var session          = require('express-session');
-//var passportSocketIO = require('passport.socketio');
+var passportSocketIO = require('passport.socketio');
 //var RedisStore       = require('connect-redis')(session);
 var request          = require('request');
 var bodyParser       = require('body-parser');
 var mysql            = require('mysql');
+/*
 const mongoose = require('mongoose')
-
-
 mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost/annotations', { useNewUrlParser: true })
 const db = mongoose.connection
 db.on('error', (error) => console.error(error))
@@ -30,9 +29,9 @@ app.use('/users',usersRouter)
 
 const imagesRouter = require('./models/images')
 app.use('/images',imagesRouter)
+*/
 
 
-/*
 var mySQLStore = require('connect-mysql')(session),
     sqlStoreOptions = {
       config: {
@@ -44,7 +43,7 @@ var mySQLStore = require('connect-mysql')(session),
       cleanup: true
     };
 var sessionStore = new mySQLStore(sqlStoreOptions);
-*/
+
 
 var bcrypt           = require('bcrypt');
 var flash            = require('connect-flash');
@@ -57,7 +56,7 @@ const { resolve } = require('path');
 const e = require('express');
 const { transformAuthInfo } = require('passport');
 
-/*
+
 var db_config = {
  host: 'localhost',
  user: 'root',
@@ -68,9 +67,15 @@ var db_config = {
 
 };
 
+app.use(session({
+	secret: 'secret',
+	resave: true,
+	saveUninitialized: true
+}));
+
 var connection;
 var pool = mysql.createPool(db_config);
-*/
+
 connection = {
     query: function () {
 	
@@ -194,6 +199,9 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
+app.get('/', function(request, response) {
+	response.sendFile(path.join(__dirname + '/login.html'));
+});
 
 passport.use('local-signup', new LocalStrategy({
   usernameField: 'email',
@@ -299,7 +307,7 @@ app.use(function(err,req,res,next){
   }
 })
 
-
+/*
 // Client reaching the home page
 app.get('/', function(req, res) {
   if (req.isAuthenticated() == 1) {
@@ -308,6 +316,7 @@ app.get('/', function(req, res) {
     res.redirect('/index');
   }
 });
+*/
 
 //this is callback for us, not the browser default callback.
 app.get('/callback', function(req, res) {
@@ -334,9 +343,9 @@ app.get('/index', function(req, res) { //this will be the 'About' page
 });
 
 
-app.get('/participate', alreadyLoggedIn, function(req, res) { //this will be the 'Participate' Page ONLY ACCESSIBLE IF NOT AUTHENTICATED
-  req.session.lastPage = '/participate';
-  res.render('pages/participate', {
+app.get('/annotation', alreadyLoggedIn, function(req, res) { 
+  req.session.lastPage = '/annotation';
+  res.render('pages/annotation', {
     auth: req.isAuthenticated(),
     page: 1
   });
