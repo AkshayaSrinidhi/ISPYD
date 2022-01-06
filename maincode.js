@@ -13,7 +13,8 @@ var passportSocketIO = require('passport.socketio');
 //var RedisStore       = require('connect-redis')(session);
 var request          = require('request');
 var bodyParser       = require('body-parser');
-var mysql            = require('mysql');
+var mysql            = require('mysql2');
+
 /*
 const mongoose = require('mongoose')
 mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost/annotations', { useNewUrlParser: true })
@@ -28,24 +29,30 @@ const usersRouter = require('./models/users')
 app.use('/users',usersRouter)
 
 const imagesRouter = require('./models/images')
-app.use('/images',imagesRouter)
+app.use('/',imagesRouter)
 */
 
-
-var mySQLStore = require('connect-mysql')(session),
-    sqlStoreOptions = {
-      config: {
-        host: 'localhost',
-        user: 'root',
-        password: 'RizzoLab',
-        database: 'ISPYD'
-      },
-      cleanup: true
-    };
-var sessionStore = new mySQLStore(sqlStoreOptions);
+var db = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "RizzoLab",
+  database: "ISPYD",
+});
 
 
-var bcrypt           = require('bcrypt');
+
+db.connect( (err)=> {
+  if (err) throw (err)
+  console.log ("DB connected successful..");
+});
+
+app.use(session({
+	secret: 'secret',
+	resave: true,
+	saveUninitialized: true
+}));
+
+app.use(express.json())
 var flash            = require('connect-flash');
 var nodemailer = require('nodemailer');
 var async = require('async');
@@ -55,26 +62,9 @@ const fs = require('fs');
 const { resolve } = require('path');
 const e = require('express');
 const { transformAuthInfo } = require('passport');
+const { name } = require('ejs');
 
-
-var db_config = {
- host: 'localhost',
- user: 'root',
- password: 'RizzoLab',
- database: 'ISPYD',
- acquireTimeout: 25000,
- connectionLimit: 20
-
-};
-
-app.use(session({
-	secret: 'secret',
-	resave: true,
-	saveUninitialized: true
-}));
-
-var connection;
-var pool = mysql.createPool(db_config);
+/*
 
 connection = {
     query: function () {
@@ -119,6 +109,7 @@ connection = {
         };
     }
 };
+*/
 
 function alreadyLoggedIn(req, res, next) {
     if (req.isAuthenticated()) { // if for some reason the user goes to login or signup
@@ -147,27 +138,8 @@ app.use(flash());
 app.use(bodyParser.json({limit: "50mb"}));
 app.use(bodyParser.urlencoded({limit: "50mb", extended: false }));
 
-
-app.use(session({
-  // String used to compute the hash
-  secret: 'supersecret',
-  resave: false,
-  saveUninitialized: false,
-  
-  cookie: {
-	// This means the cookie will be kept for a day
-    maxAge: 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    secure: false
-  }
-}));
-
-//app.use('/scripts', express.static(__dirname + '/newpub/scripts')); 
 app.use('/images',  express.static(__dirname + '/images'));
-//app.use('/socket.io',express.static(__dirname + '/node_modules/socket.io'))
-//app.set('views',    path.join(__dirname, '/booted/views'));  //app.get now gets the templates from this directory. 
-app.set('view engine', 'ejs'); //app.get now only needs name of the file (ejs file)
-
+app.set('view engine', 'ejs'); 
 
 //initialize passport
 app.use(passport.initialize());
@@ -307,7 +279,7 @@ app.use(function(err,req,res,next){
   }
 })
 
-/*
+
 // Client reaching the home page
 app.get('/', function(req, res) {
   if (req.isAuthenticated() == 1) {
@@ -316,7 +288,29 @@ app.get('/', function(req, res) {
     res.redirect('/index');
   }
 });
-*/
+
+// Add a user
+app.post('/users', (req, res) => {
+  console.log('Trying to add user using api')
+  
+  let user = {
+      name: req.body.user_name,
+      email: req.body.email,
+      password: req.body.password
+  };
+  		
+	console.log('Trying to add user using api')
+	
+			
+  let sql = 'INSERT INTO users set ?'
+  let query = db.query(sql, user, (err, result) => {
+    if(err) throw err;
+    console.log(result);
+    res.send('New User Created...')
+    res.redirect('/login');
+  });
+  
+});
 
 //this is callback for us, not the browser default callback.
 app.get('/callback', function(req, res) {
@@ -786,75 +780,6 @@ app.post('/change_password', mustBeLoggedIn, function(req,res){
     res.redirect('/profile');
 });
 
-/*
-
-//------------------------------------------------Profile Stuff -------------------------------------------------------------
-
-//this will be the 'Profile' Page ONLY ACCESSIBLE IF AUTHENTICATED
-app.get('/profile', mustBeLoggedIn, function(req, res) { 
-  let lastPage = req.session.lastPage;
-  req.session.lastPage = '/profile';
-  connection.query({ 
-    sql: "SELECT * FROM userInfo WHERE id = ?",
-    values:[req.user.id]  
-  }, function(err, rows){
-    if (err){ 
-      console.log('Error when getting auth column in profile' + err);
-      return(err);
-    //no error, load the page with user uploaded picture, if no pictures were uploaded, the value for pic will be 'default.jpg'
-    } else {
-      let profile_pic = rows[0].profile_picture;
-      delete rows[0].profile_picture;
-      console.log(rows[0]);
-      let infoObj = JSON.stringify(rows[0]);
-
-      dataLogger(req.user.id,"move","profile");
-      if (rows[0].tutorial_completion == 0) {
-        res.render('pages/profile_v2', {
-          id: req.user.id,
-          auth: req.isAuthenticated(),
-          page: 1,
-          errmsg:req.flash('err'),
-          pic: profile_pic,
-          info: infoObj, //user public information
-          first_time: 2 //this means user has not even done tutorial yet
-        });
-      } else if (rows[0].pics_done == 0) {
-        res.render('pages/profile_v2', {
-          id: req.user.id,
-          auth: req.isAuthenticated(),
-          page: 1,
-          errmsg:req.flash('err'),
-          pic: profile_pic,
-          info: infoObj, //user public information
-          first_time: 1 //this means user has not done real tutorials yet
-        });
-      } else {
-        res.render('pages/profile_v2', {
-          id: req.user.id,
-          auth: req.isAuthenticated(),
-          page: 1,
-          errmsg:req.flash('err'),
-          pic: profile_pic,
-          info: infoObj, //user public information
-          first_time: 0
-        });
-      }
-    }
-  });
-
-
-});
-
-app.post('/exitDataLogger', function(req,res){
-  console.log("in the exit data logger pog");
-  if (typeof(req.body.pageName) == "string") {
-    dataLogger(req.user.id,"exit",req.body.pageName);
-  }
-});
-
-http.listen(8080, function(){
-    console.log('listening on *:8080');
-  });
-
-*/
+const port = process.env.PORT || 5500;
+app.listen(port, 
+()=> console.log(`Server Started on port ${port}...`))

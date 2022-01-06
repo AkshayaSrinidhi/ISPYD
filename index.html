@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title> Signup Form</title>
-		
+	<script src = "maincode.js"></script>	
 		
 <link rel="stylesheet"
 href=
@@ -27,7 +27,7 @@ crossorigin="anonymous">
 				
 		<div class="col-md-6 main">
 					
-			<form action="/sign_up" method="post">
+			<form>
 					
 			<h1> Signup form </h1>
 							
@@ -40,11 +40,41 @@ crossorigin="anonymous">
 			<input class="box" type="password" name="password"
 			id="password" placeholder="Password " required/><br>
 			
-			<input type="submit" id="submitDetails"
-			name="submitDetails" value="Submit" /><br>
+			<input type="button" id="submitDetails"
+			name="submitDetails" value="Submit" onclick="addUser()"/><br>
 					
 			</form>
+			
+			<script>
+				function addUser() {
 					
+				  var name = document.getElementById('name').value
+				  var email = document.getElementById('email').value
+				  var password = document.getElementById('password').value
+		  
+				   fetch('http://127.0.0.1:8080/users', {
+					 method: 'POST',
+					 headers: {
+						'content-type': 'application/json',
+						'Access-Control-Allow-Credentials': 'true',
+						'Allow': 'POST'
+					  },
+					 body: {
+					  user_name: name,
+					  email: email,
+					  password:password
+					}
+				  })
+					.then(response => {
+					  console.log(response)
+					})
+					.catch(err => {
+					   console.log(err)
+					})
+		  
+				}
+			  </script>
+				
 		</div>
 				
 				

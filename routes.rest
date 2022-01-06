@@ -1,7 +1,70 @@
-POST http://127.0.0.1:5500/
+POST http://127.0.0.1:8080/register
 Content-Type: application/json
 
 {
-"user_name": "test", "email": "akjd@gmail.com", "password": "aswdaws"
+"name": "motest2", 
+"email": "akjd@gmail.com", 
+"password": "aswdaws"
 }
 
+###
+
+POST http://127.0.0.1:5500/singlogin
+Content-Type: application/json
+
+{
+"user_name": "test", 
+"email": "akjd@gmail.com", 
+"password": "aswdaws"
+}
+
+###
+
+POST http://127.0.0.1:8080/users
+Content-Type: application/json
+
+{
+"name": "x", 
+"email": "akjd@gmail.com", 
+"password": "aswdaws"
+}
+
+###
+
+POST http://127.0.0.1:8080/login
+Content-Type: application/json
+
+{
+"email": "akjd@gmail.com", 
+"password": "qwerty"
+}
+
+###
+
+GET http://127.0.0.1:8080/users/9
+
+
+###
+
+POST http://127.0.0.1:8080/login
+Content-Type: application/json
+
+{
+"email": "akjd@gmail.com", 
+"password": "qwertyasd"
+}
+
+###
+
+POST http://127.0.0.1:8080/annotate
+Content-Type: application/json
+
+{
+"user_id": 1, 
+"image_id": 1, 
+"label": "test", 
+"x": 32,
+"y": 32,
+"width": 32,
+"height": 100
+}

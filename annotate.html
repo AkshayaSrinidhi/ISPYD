@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>I SPY- D</title>
+   
+   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" />
+   <link rel="icon" href="/favicon.ico">
+
+   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+   
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+   <link rel="stylesheet" href="https://unpkg.com/jcrop/dist/jcrop.css">
+   <script src="https://unpkg.com/jcrop"></script>
+   <script src="imageselection.js"></script>
+   
+  
+     <style>
+      body {
+        background-color: rgb(224, 220, 215);
+        }
+
+       h1 {
+        color: maroon;
+         margin-left: 20px;
+        } 
+ </style>
+         
+     
+  </head>
+    <head>
+    <title>CSS Website Layout</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    body {
+      margin: 0;
+    }
+    
+    
+    .header {
+      background-color: #f1f1f1;
+      padding: 18px;
+      text-align: center;
+    }
+    </style>
+    </head>
+    
+    <div class="header">
+     <h1>I SPY D</h1>
+     </div>
+
+</body>
+    <body>
+      <h1>
+        
+        <div id="image-div" style = "display:flex;justify-content:center;">
+        <form action="http://127.0.0.1:5500/annotate" method="POST" >
+          <img id="image" src="images/crosswalk.JPEG" alt="My image" width=600px>
+          <div style="display:inline-block;vertical-align:top;">
+          <!--<button class="js-next" data-id="<%=@image.id%>">Next</button>
+          <input type="text" id="annotation" name="annotation" placeholder="Enter Label" rows="1" cols="50" style="font-family:monospace;"></textarea>
+          <button class="js-prev" data-id="<%=@image.id%>" >Previous</button>
+          -->
+          <a href="#" class="previous">&laquo; Previous</a>
+          <input type="text" id="annotation" name="annotation" placeholder="Enter Label" rows="1" cols="50" style="font-family:monospace;"></textarea>
+          <a href="#" class="next">Next &raquo;</a>
+          <input type="hidden" id="x" name="x">
+
+          <input type="hidden" id="y" name="y">
+
+          <input type="hidden" id="width" name="width">
+
+          <input type="hidden" id="height" name=height>
+          
+          <input id="save_button" type="submit" value="Save" />
+          <script src="maincode.js" ></script>
+          </div>
+      </form>
+      </div>
+      <script>
+        
+        let pos;   
+        const stage = Jcrop.attach('image',{
+        multi: false});
+        stage.listen('crop.change',function(widget,e){
+           console.log("inside tagging script")
+           pos = widget.pos;
+           document.getElementById('x').value = pos.x
+ 
+           document.getElementById('y').value = pos.y
+ 
+           document.getElementById('width').value = pos.w
+ 
+           document.getElementById('height').value = pos.h
+ 
+           console.log(pos.x,pos.y,pos.w,pos.h);
+        });
+        
+
+      function save_annotation() {
+         var label = document.getElementById('annotation').value
+
+         fetch('http://127.0.0.1:5500/annotations/', {
+           method: 'POST',
+           headers: {
+              'content-type': 'application/json'
+            },
+           body: {
+            user_id: 'Roger',
+            image_id: 8,
+            x:pos.x,
+            y:pos.y,
+            height:pos.h,
+            width:pos.w,
+            label:label
+          }
+        })
+          .then(response => {
+            console.log(response)
+          })
+          .catch(err => {
+             console.log(err)
+          })
+
+      }
+
+
+       </script>
+       </div>
+         <div style="display:inline;vertical-align:bottom;">
+          <h1 style="font-size:100%;">Annotate objects in the given picture</h1>
+          <hr class="my-4">
+
+          
+                <ol>
+                  <p> Instruction :</p>
+                  <li>Draw a rectangle over an object and then name that object</li>
+                  <li>Click save to save the current object</li>
+                  <li>Repeat the process for further objects</li>
+                  <li>Save as many objects as you can find in the image.</li>
+                  <li>Click on next and previous to move to other images.</li>
+                  <li>Click on other categories to see more images </li>
+                </ol>  
+      <div>
+        <h1 style="font-size:100%;">Click here for more image categories</h1>
+        <hr class="my-4">
+     
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        
+        </div>
+       
+            <li><a href="#about.html">Crosswalk</a></li>
+            <li><a href="#contact.html">Street  </a></li>
+           
+           
+            </li>
+          </ul>
+
+      </div>
+    </nav>
+
+    <script>
+    </script>
+   </body>
+</html>

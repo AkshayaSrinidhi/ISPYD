@@ -16,15 +16,15 @@ var connection;
 
 const db = mysql.createPool({
    connectionLimit: 100,
-   host: "localhost",       //This is your localhost IP
-   user: "root",         // "newuser" created in Step 1(e)
-   password: "RizzoLab",  // password for the new user
-   database: "ISPYD",      // Database name
-   port: "3306"             // port name, "3306" by default
+   host: "localhost",       
+   user: "root",        
+   password: "RizzoLab",  
+   database: "ISPYD",      
+   port: "3306"            
 })
 db.getConnection( (err, connection)=> {
    if (err) throw (err)
-   console.log ("DB connected successful: " + connection.threadId)
+   console.log ("DB connected successful: " + connection.threadId);
 })
 
 app.use(session({
@@ -32,7 +32,7 @@ app.use(session({
 	resave: true,
 	saveUninitialized: true
 }));
-
+/*
 require("dotenv").config()
 const DB_HOST = process.env.DB_HOST
 const DB_USER = process.env.DB_USER
@@ -41,13 +41,13 @@ const DB_DATABASE = process.env.DB_DATABASE
 const DB_PORT = process.env.DB_PORT
 const DB2 = mysql.createPool({
    
-   host: DB_HOST,
+   host: 'local host',
    user: DB_USER,
    password: DB_PASSWORD,
    database: DB_DATABASE,
    port: DB_PORT
 })
-
+*/
 const port = process.env.PORT
 app.listen(port, 
 ()=> console.log(`Server Started on port ${port}...`))
