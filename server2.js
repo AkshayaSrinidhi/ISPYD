@@ -114,7 +114,7 @@ app.post('/register', checkNotAuthenticated, async (req, res) => {
         })
         const newUser = await User.create(user)
         //res.status(201).json(newUser)
-        res.redirect('/login')
+        res.redirect('/annotate')
     } catch {
       res.redirect('/register')
     }
